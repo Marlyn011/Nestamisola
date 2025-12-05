@@ -35,9 +35,9 @@ export class PositionsService {
 
     const position_id = result.insertId;
 
-    // Return the created record including timestamps
+    // Return the created record with proper id
     const [rows] = await this.pool().execute<RowDataPacket[]>(
-      `SELECT position_id, position_code, position_name, user_id AS id,
+      `SELECT position_id AS id, position_code, position_name, user_id,
               created_at, updated_at
        FROM positions WHERE position_id = ?`,
       [position_id],
@@ -51,7 +51,7 @@ export class PositionsService {
    */
   async getAll() {
     const [rows] = await this.pool().execute<RowDataPacket[]>(
-      `SELECT position_id, position_code, position_name, user_id AS id,
+      `SELECT position_id AS id, position_code, position_name, user_id,
               created_at, updated_at
        FROM positions`,
     );
@@ -63,7 +63,7 @@ export class PositionsService {
    */
   async findById(id: number) {
     const [rows] = await this.pool().execute<RowDataPacket[]>(
-      `SELECT position_id, position_code, position_name, user_id AS id,
+      `SELECT position_id AS id, position_code, position_name, user_id,
               created_at, updated_at
        FROM positions WHERE position_id = ?`,
       [id],
@@ -78,7 +78,7 @@ export class PositionsService {
 
   /**
    * UPDATE an existing position
-   * Returns only a success message
+   * Returns a success message
    */
   async updatePosition(
     id: number,
@@ -112,13 +112,12 @@ export class PositionsService {
       throw new NotFoundException(`Position with id ${id} not found`);
     }
 
-    // Return success message only
     return { message: 'Position updated successfully' };
   }
 
   /**
    * DELETE a position by ID
-   * Returns only a success message
+   * Returns a success message
    */
   async deletePosition(id: number) {
     const [res] = await this.pool().execute<OkPacket>(
